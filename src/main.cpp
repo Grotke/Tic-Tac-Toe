@@ -1,47 +1,20 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
+#include "button.h"
+#include "customevents.h"
+
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
-const int TILE_SIZE = 40;
-/*Log an SDL error with some error message to the output stream of our choice.
-    @param os The output stream to write the message to
-    @param msg The error message to write, format will be msg error: SDL_GetError()
-*/
+const int BUTTON_WIDTH = 100;
+const int BUTTON_HEIGHT = 50;
 
 void logSDLError(std::ostream &os, const std::string &msg)
 {
     os << msg << " error: " << SDL_GetError() << std::endl;
 }
 
-SDL_Texture * loadTexture(const std::string &file, SDL_Renderer * ren)
-{
-    SDL_Texture *texture = IMG_LoadTexture(ren, file.c_str());
-
-    if(texture == nullptr)
-    {
-        logSDLError(std::cout, "LoadTexture");
-    }
-    return texture;
-}
-
-void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, int w = -1, int h = -1)
-{
-    SDL_Rect dst;
-    dst.x = x;
-    dst.y = y;
-    if(w == -1 || h == -1)
-    {
-        SDL_QueryTexture(tex, NULL,NULL, &w, &h);
-    }
-
-    dst.w = w;
-    dst.h = h;
-
-    SDL_RenderCopy(ren, tex, NULL, &dst);
-}
-
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -49,7 +22,7 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-    SDL_Window *win = SDL_CreateWindow("Lesson 2",100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window *win = SDL_CreateWindow("Tic-Tac-Toe!",100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (win == nullptr)
     {
         logSDLError(std::cout, "CreateWindow");
@@ -66,43 +39,44 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-    SDL_Texture * background = loadTexture("background1.png", ren);
-    SDL_Texture *image = loadTexture("image1.png", ren);
-    if (background == nullptr || image == nullptr)
+    Uint8 red = 0xFF;
+    Uint8 blue = 0xFF;
+    Uint8 green = 0xFF;
+    Uint8 trans = 0xFF;
+    int nextScreen = 0;
+    Button button = Button(300,200,BUTTON_WIDTH,BUTTON_HEIGHT,CustomEvent::GAMESTARTED);
+    button.setTexturesIndivdual(ren,"assets/normalState.png","assets/mouseoverState.png","assets/clickedState.png");
+
+    while(!nextScreen)
     {
-        SDL_DestroyTexture(image);
-        SDL_DestroyTexture(background);
-        SDL_DestroyRenderer(ren);
-        SDL_DestroyWindow(win);
-        IMG_Quit();
-        SDL_Quit();
-        return 1;
+        SDL_Event e;
+        while(SDL_PollEvent(&e) != 0)
+        {
+            if(e.type == SDL_USEREVENT)
+            {
+                if(e.user.code == (int)CustomEvent::GAMESTARTED)
+                {
+                    blue = 0;
+                    button.disable();
+                }
+            }
+            button.handleEvent(&e);
+            if(e.type == SDL_QUIT)
+            {
+                nextScreen = 1;
+            }
+            SDL_SetRenderDrawColor(ren, red,green,blue, trans);
+            SDL_RenderClear(ren);
+            button.render(ren);
+            SDL_RenderPresent(ren);
+
+            if(!button.isEnabled())
+            {
+                SDL_Delay(2000);
+                button.enable();
+            }
+        }
     }
-
-
-    SDL_RenderClear(ren);
-    int xTiles = SCREEN_WIDTH /TILE_SIZE;
-    int yTiles = SCREEN_HEIGHT /TILE_SIZE;
-
-    for(int i = 0; i < xTiles *yTiles; ++i)
-    {
-        int x = i % xTiles;
-        int y = i /xTiles;
-        renderTexture(background, ren, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-
-    }
-
-    int iW, iH;
-    SDL_QueryTexture(image, NULL,NULL, &iW, &iH);
-    int x = SCREEN_WIDTH /2 -iW/2;
-    int y = SCREEN_HEIGHT/2 -iH/2;
-    renderTexture(image, ren, x, y);
-    SDL_RenderPresent(ren);
-
-    SDL_Delay(2000);
-
-    SDL_DestroyTexture(image);
-    SDL_DestroyTexture(background);
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
     IMG_Quit();
@@ -110,3 +84,4 @@ int main(int argc, char * argv[])
 
     return 0;
 }
+

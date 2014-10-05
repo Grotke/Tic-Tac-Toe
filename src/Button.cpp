@@ -1,15 +1,18 @@
-#include "button.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <iostream>
+#include "customevents.h"
+#include "button.h"
 
-Button::Button(int x, int y, int width, int height)
+Button::Button(int x, int y, int width, int height, CustomEvent eventToRegister)
 {
     buttonX = x;
     buttonY = y;
     buttonW = width;
     buttonH = height;
     currentState = ButtonState::NORMAL;
+    eventOnClick = eventToRegister;
+    enabled = true;
 }
 
 Button::~Button()
@@ -51,17 +54,14 @@ void Button::render(SDL_Renderer* ren)
     SDL_RenderCopy(ren,buttonTextures[(int)currentState],nullptr, &renderRect);
 }
 
-bool Button::setTexturesWithSheet(std::string &sheetPath)
-{
-    return true;
-}
 
-bool Button::setTexturesIndivdual(SDL_Renderer* ren,const std::string &normalPath, const std::string &mouseoverPath, const std::string &clickedPath)
+bool Button::setTexturesIndivdual(SDL_Renderer* ren, const std::string &normalPath, const std::string &mouseoverPath, const std::string &clickedPath)
 {
     bool success = true;
     buttonTextures[(int)ButtonState::NORMAL] = IMG_LoadTexture(ren, normalPath.c_str());
     buttonTextures[(int)ButtonState::MOUSEOVER] = IMG_LoadTexture(ren, mouseoverPath.c_str());
     buttonTextures[(int)ButtonState::CLICKED] = IMG_LoadTexture(ren, clickedPath.c_str());
+
     for(int i = 0; i < TOTAL_BUTTON_STATES; i++)
     {
         if(buttonTextures[i] == nullptr)
@@ -75,21 +75,29 @@ bool Button::setTexturesIndivdual(SDL_Renderer* ren,const std::string &normalPat
 
 void Button::handleEvent(SDL_Event* e)
 {
-    if(insideButton() && e->type == SDL_MOUSEBUTTONDOWN)
-    {
-        currentState = ButtonState::CLICKED;
-    }
-    else if(e->type == SDL_MOUSEBUTTONUP)
-    {
-        currentState = ButtonState::NORMAL;
-    }
-    else if(insideButton() && e->type == SDL_MOUSEMOTION)
-    {
-        currentState = ButtonState::MOUSEOVER;
-    }
-    else
-    {
-        currentState = ButtonState::NORMAL;
+    if(enabled){
+        if(insideButton() && e->type == SDL_MOUSEBUTTONDOWN)
+        {
+            currentState = ButtonState::CLICKED;
+
+            SDL_Event event;
+            SDL_zero(event);
+            event.type = SDL_USEREVENT;
+            event.user.code = (int)eventOnClick;
+            SDL_PushEvent(&event);
+        }
+        else if(e->type == SDL_MOUSEBUTTONUP)
+        {
+            currentState = ButtonState::NORMAL;
+        }
+        else if(insideButton() && e->type == SDL_MOUSEMOTION)
+        {
+            currentState = ButtonState::MOUSEOVER;
+        }
+        else
+        {
+            currentState = ButtonState::NORMAL;
+        }
     }
 }
 
@@ -104,8 +112,18 @@ void Button::free()
     }
 }
 
-
-void Button::setClickAction()
+void Button::disable()
 {
+    currentState = ButtonState::NORMAL;
+    enabled = false;
+}
 
+void Button::enable()
+{
+    enabled = true;
+}
+
+bool Button::isEnabled()
+{
+    return enabled;
 }
