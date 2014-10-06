@@ -1,6 +1,6 @@
 #include <iostream>
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include "button.h"
 #include "customevents.h"
 
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     Uint8 trans = 0xFF;
     int nextScreen = 0;
     Button button = Button(300,200,BUTTON_WIDTH,BUTTON_HEIGHT,CustomEvent::GAMESTARTED);
-    button.setTexturesIndivdual(ren,"assets/normalState.png","assets/mouseoverState.png","assets/clickedState.png");
+    button.setTexturesIndivdual(ren,"../assets/normalState.png","../assets/mouseoverState.png","../assets/clickedState.png");
 
     while(!nextScreen)
     {
