@@ -1,6 +1,8 @@
 #include <SDL2/SDL.h>
 #include <string>
+#include <memory>
 #include "customevents.h"
+#include "ltexture.h"
 
 #ifndef BUTTON_H_
 #define BUTTON_H_
@@ -13,7 +15,6 @@ class Button
         void disable();
         void enable();
         bool isEnabled();
-        void setClickAction();
         void handleEvent(SDL_Event* e);
         void setSize(int width, int height);
         void setPosition(int x, int y);
@@ -21,6 +22,7 @@ class Button
         bool setTexturesIndivdual(SDL_Renderer* ren, const std::string &normalPath, const std::string &mouseoverPath, const std::string &clickedPath);
 
     private:
+	typedef std::shared_ptr<LTexture> TextureSharedPtr;
         bool enabled;
         CustomEvent eventOnClick;
         static const int TOTAL_BUTTON_STATES = 3;
@@ -28,7 +30,8 @@ class Button
         int buttonX, buttonY, buttonW, buttonH;
         ButtonState currentState;
         bool insideButton();
-        SDL_Texture* buttonTextures[TOTAL_BUTTON_STATES];
+	bool renderable;
+        TextureSharedPtr buttonTextures[TOTAL_BUTTON_STATES];
 };
 
 #endif

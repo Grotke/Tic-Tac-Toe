@@ -1,8 +1,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <stdio.h>
 #include <iostream>
 #include "customevents.h"
 #include "button.h"
+#include "ltexture.h"
 
 Button::Button(int x, int y, int width, int height, CustomEvent eventToRegister)
 {
@@ -13,6 +15,7 @@ Button::Button(int x, int y, int width, int height, CustomEvent eventToRegister)
     currentState = ButtonState::NORMAL;
     eventOnClick = eventToRegister;
     enabled = true;
+    renderable = true;
 }
 
 Button::~Button()
@@ -25,6 +28,7 @@ void Button::setSize(int width, int height)
     buttonW = width;
     buttonH = height;
 }
+
 
 void Button::setPosition(int x, int y)
 {
@@ -50,27 +54,31 @@ bool Button::insideButton()
 
 void Button::render(SDL_Renderer* ren)
 {
-    SDL_Rect renderRect = {buttonX, buttonY,buttonW,buttonH};
-    SDL_RenderCopy(ren,buttonTextures[(int)currentState],nullptr, &renderRect);
+    if(renderable){
+   	 buttonTextures[static_cast<int>(currentState)]->setSize(buttonW,buttonH);
+    	buttonTextures[static_cast<int>(currentState)]->render(ren,buttonX,buttonY);
+    }
 }
 
 
 bool Button::setTexturesIndivdual(SDL_Renderer* ren, const std::string &normalPath, const std::string &mouseoverPath, const std::string &clickedPath)
 {
     bool success = true;
-    buttonTextures[(int)ButtonState::NORMAL] = IMG_LoadTexture(ren, normalPath.c_str());
-    buttonTextures[(int)ButtonState::MOUSEOVER] = IMG_LoadTexture(ren, mouseoverPath.c_str());
-    buttonTextures[(int)ButtonState::CLICKED] = IMG_LoadTexture(ren, clickedPath.c_str());
+
+    buttonTextures[static_cast<int>(ButtonState::NORMAL)] = TextureSharedPtr(new LTexture(ren,normalPath));
+    buttonTextures[static_cast<int>(ButtonState::MOUSEOVER)] = TextureSharedPtr(new LTexture(ren,mouseoverPath));
+    buttonTextures[static_cast<int>(ButtonState::CLICKED)] = TextureSharedPtr(new LTexture(ren,clickedPath));
 
     for(int i = 0; i < TOTAL_BUTTON_STATES; i++)
     {
-        if(buttonTextures[i] == nullptr)
+        if(!buttonTextures[i]->isTextureSet())
         {
             std::cout << "Error: " << SDL_GetError() << std::endl;
             success = false;
         }
     }
     return success;
+    
 }
 
 void Button::handleEvent(SDL_Event* e)
@@ -83,7 +91,7 @@ void Button::handleEvent(SDL_Event* e)
             SDL_Event event;
             SDL_zero(event);
             event.type = SDL_USEREVENT;
-            event.user.code = (int)eventOnClick;
+            event.user.code = static_cast<int>(eventOnClick);
             SDL_PushEvent(&event);
         }
         else if(e->type == SDL_MOUSEBUTTONUP)
@@ -103,12 +111,10 @@ void Button::handleEvent(SDL_Event* e)
 
 void Button::free()
 {
+    renderable = false;
     for(int i = 0; i < TOTAL_BUTTON_STATES; i++)
     {
-        if(buttonTextures[i] != nullptr)
-        {
-            SDL_DestroyTexture(buttonTextures[i]);
-        }
+	buttonTextures[i] = nullptr;
     }
 }
 

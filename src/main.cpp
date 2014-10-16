@@ -46,7 +46,8 @@ int main(int argc, char* argv[])
     int nextScreen = 0;
     Button button = Button(300,200,BUTTON_WIDTH,BUTTON_HEIGHT,CustomEvent::GAMESTARTED);
     button.setTexturesIndivdual(ren,"../assets/normalState.png","../assets/mouseoverState.png","../assets/clickedState.png");
-
+    Button button2 = button;
+    button2.setPosition(100,50);
     while(!nextScreen)
     {
         SDL_Event e;
@@ -54,13 +55,14 @@ int main(int argc, char* argv[])
         {
             if(e.type == SDL_USEREVENT)
             {
-                if(e.user.code == (int)CustomEvent::GAMESTARTED)
+                if(e.user.code == static_cast<int>(CustomEvent::GAMESTARTED))
                 {
                     blue = 0;
-                    button.disable();
+                    button.free();
                 }
             }
             button.handleEvent(&e);
+	    button2.handleEvent(&e);
             if(e.type == SDL_QUIT)
             {
                 nextScreen = 1;
@@ -68,13 +70,8 @@ int main(int argc, char* argv[])
             SDL_SetRenderDrawColor(ren, red,green,blue, trans);
             SDL_RenderClear(ren);
             button.render(ren);
+	    button2.render(ren);
             SDL_RenderPresent(ren);
-
-            if(!button.isEnabled())
-            {
-                SDL_Delay(2000);
-                button.enable();
-            }
         }
     }
     SDL_DestroyRenderer(ren);
