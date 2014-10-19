@@ -13,7 +13,7 @@ class LTexture
 		bool loadFromFile(SDL_Renderer *ren, const std::string &path);
 		bool isTextureSet();
 		void free();
-		void render(SDL_Renderer *ren,int x, int y);
+		void render(SDL_Renderer *ren,int x = -1, int y = -1);
 		int getWidth() {return width;}
 		int getHeight() {return height;}
 	private:

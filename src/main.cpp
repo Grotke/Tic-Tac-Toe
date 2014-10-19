@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include "button.h"
 #include "customevents.h"
+#include "screen.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -44,10 +45,12 @@ int main(int argc, char* argv[])
     Uint8 green = 0xFF;
     Uint8 trans = 0xFF;
     int nextScreen = 0;
+    Screen newScreen;
     Button button = Button(300,200,BUTTON_WIDTH,BUTTON_HEIGHT,CustomEvent::GAMESTARTED);
     button.setTexturesIndivdual(ren,"../assets/normalState.png","../assets/mouseoverState.png","../assets/clickedState.png");
-    Button button2 = button;
-    button2.setPosition(100,50);
+    newScreen.addButton(button);
+    newScreen.loadBackground(ren,"../assets/mouseoverState.png");
+
     while(!nextScreen)
     {
         SDL_Event e;
@@ -58,19 +61,18 @@ int main(int argc, char* argv[])
                 if(e.user.code == static_cast<int>(CustomEvent::GAMESTARTED))
                 {
                     blue = 0;
-                    button.free();
+		    newScreen.deleteScreen();
                 }
             }
-            button.handleEvent(&e);
-	    button2.handleEvent(&e);
+       
+	    newScreen.handleEvent(&e);
             if(e.type == SDL_QUIT)
             {
                 nextScreen = 1;
             }
             SDL_SetRenderDrawColor(ren, red,green,blue, trans);
             SDL_RenderClear(ren);
-            button.render(ren);
-	    button2.render(ren);
+	    newScreen.render(ren);
             SDL_RenderPresent(ren);
         }
     }

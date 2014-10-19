@@ -17,12 +17,15 @@ clean:
 ltexture.o:
 	$(CXX) $(CXXFLAGS) $(PROJ_DIR)/src/ltexture.cpp $(CPPFLAGS) -c -o ltexture.o
 
+screen.o:	
+	$(CXX) $(CXXFLAGS) $(PROJ_DIR)/src/screen.cpp $(CPPFLAGS) -c -o screen.o
+
 button.o:
 	$(CXX) $(CXXFLAGS) $(PROJ_DIR)/src/button.cpp $(CPPFLAGS) -c -o button.o
 main.o:
 	$(CXX) $(CXXFLAGS) $(PROJ_DIR)/src/main.cpp $(CPPFLAGS) -c -o main.o
 
-$(EXECUTABLE): ltexture.o button.o main.o 
+$(EXECUTABLE): ltexture.o screen.o button.o main.o 
 	$(CXX) $(CXXFLAGS) $^ $(CPPFLAGS) -o $@
 
 
