@@ -40,17 +40,9 @@ void LTexture::free()
 	}	
 }
 
-void LTexture::render(SDL_Renderer * ren, int x, int y)
+void LTexture::render(SDL_Renderer * ren, SDL_Rect *source, SDL_Rect *destination)
 {
-	SDL_Rect renderRect = {x, y, width, height};
-	if(x != -1)
-	{
-		SDL_RenderCopy(ren,texture,nullptr,&renderRect);
-	}
-	else
-	{
-		SDL_RenderCopy(ren,texture,nullptr,nullptr);
-	}
+	SDL_RenderCopy(ren,texture,source,destination);
 }
 
 bool LTexture::loadFromFile(SDL_Renderer *ren, const std::string &path)

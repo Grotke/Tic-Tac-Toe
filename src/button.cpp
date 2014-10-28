@@ -55,8 +55,8 @@ bool Button::insideButton()
 void Button::render(SDL_Renderer* ren)
 {
     if(renderable){
-   	 buttonTextures[static_cast<int>(currentState)]->setSize(buttonW,buttonH);
-    	buttonTextures[static_cast<int>(currentState)]->render(ren,buttonX,buttonY);
+   	SDL_Rect dest = {buttonX,buttonY, buttonW, buttonH};
+    	buttonTextures[static_cast<int>(currentState)]->render(ren,nullptr, &dest);
     }
 }
 

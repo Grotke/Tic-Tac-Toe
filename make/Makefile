@@ -2,6 +2,8 @@ PROJ_DIR = ..
 
 PROJ_HEADERS = $(PROJ_DIR)/include
 
+PROJ_SOURCE = $(PROJ_DIR)/src
+
 CPPFLAGS += -I$(PROJ_HEADERS) -lSDL2 -lSDL2_image
 
 CXXFLAGS += -g -Wall -std=c++11
@@ -13,19 +15,25 @@ all: $(EXECUTABLE)
 clean:
 	rm -f $(EXECUTABLE) *.o
 
+timer.o: $(PROJ_SOURCE)/timer.cpp $(PROJ_HEADERS)/timer.h	
+	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/timer.cpp $(CPPFLAGS) -c -o timer.o
 
-ltexture.o:
-	$(CXX) $(CXXFLAGS) $(PROJ_DIR)/src/ltexture.cpp $(CPPFLAGS) -c -o ltexture.o
+ltexture.o: $(PROJ_SOURCE)/ltexture.cpp $(PROJ_HEADERS)/ltexture.h
+	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/ltexture.cpp $(CPPFLAGS) -c -o ltexture.o
 
-screen.o:	
-	$(CXX) $(CXXFLAGS) $(PROJ_DIR)/src/screen.cpp $(CPPFLAGS) -c -o screen.o
+board.o: $(PROJ_SOURCE)/board.cpp $(PROJ_HEADERS)/board.h $(PROJ_HEADERS)/timer.h $(PROJ_HEADERS)/ltexture.h
+	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/board.cpp $(CPPFLAGS) -c -o board.o
 
-button.o:
-	$(CXX) $(CXXFLAGS) $(PROJ_DIR)/src/button.cpp $(CPPFLAGS) -c -o button.o
-main.o:
-	$(CXX) $(CXXFLAGS) $(PROJ_DIR)/src/main.cpp $(CPPFLAGS) -c -o main.o
+screen.o: $(PROJ_SOURCE)/screen.cpp  $(PROJ_HEADERS)/screen.h  $(PROJ_HEADERS)/button.h	
+	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/screen.cpp $(CPPFLAGS) -c -o screen.o
 
-$(EXECUTABLE): ltexture.o screen.o button.o main.o 
+button.o: $(PROJ_SOURCE)/button.cpp  $(PROJ_HEADERS)/button.h  $(PROJ_HEADERS)/customevents.h  $(PROJ_HEADERS)/ltexture.h
+	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/button.cpp $(CPPFLAGS) -c -o button.o
+
+main.o: $(PROJ_SOURCE)/main.cpp $(PROJ_HEADERS)/board.h $(PROJ_HEADERS)/button.h  $(PROJ_HEADERS)/customevents.h  $(PROJ_HEADERS)/screen.h
+	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/main.cpp $(CPPFLAGS) -c -o main.o
+
+$(EXECUTABLE): timer.o ltexture.o board.o screen.o button.o main.o 
 	$(CXX) $(CXXFLAGS) $^ $(CPPFLAGS) -o $@
 
 
