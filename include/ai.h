@@ -18,7 +18,7 @@ class AI
 		AIData minimax(unsigned int currentPlayerMap, unsigned int enemyPlayerMap, unsigned int winStates[], int numOfWinStates);
 		unsigned int getFreeSpots(unsigned int currentPlayerMap, unsigned int enemyPlayerMap);
 		std::vector<unsigned int> * produceMoves(unsigned int currentPlayerMap, unsigned int enemyPlayerMap);
-
+		int getAIMove(unsigned int currentPlayerMap, unsigned int enemyPlayerMap, unsigned int winStates[], int numOfWinStates);
 	private:
 		const static int numberOfBoardPositions = 9;
 	/*	typedef struct AIData

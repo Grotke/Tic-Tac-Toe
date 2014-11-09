@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include "timer.h"
 #include "ltexture.h"
+#include "ai.h"
 
 #ifndef BOARD_H_
 #define BOARD_H_
@@ -22,7 +23,9 @@ class Board
 		void declareWinner();
 		void loadTextures(SDL_Renderer *ren);
 		void freeTextures();
-	
+		void makeMove(int row, int col);
+		void makeAIMove();
+		
 		static const int ANIMATION_FRAMES = 4;
 		static const int BOARD_ROWS = 3;
 		static const int BOARD_COLS = 3;
@@ -46,8 +49,11 @@ class Board
 		unsigned int oMap;
 		unsigned int xMap;
 		unsigned int *currentMap;
+		unsigned int *aiPlayer;
+		unsigned int *humanPlayer;
 		unsigned int winStates[8] = {0x7,0x38,0x1C0,0x49,0x92,0x124,0x111,0x54};
 		Timer timer;
+		AI ai;
 		bool locked;
 
 };

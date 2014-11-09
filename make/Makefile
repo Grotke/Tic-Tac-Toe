@@ -15,6 +15,9 @@ all: $(EXECUTABLE)
 clean:
 	rm -f $(EXECUTABLE) *.o
 
+ai.o:  $(PROJ_SOURCE)/ai.cpp $(PROJ_HEADERS)/ai.h	
+	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/ai.cpp $(CPPFLAGS) -c -o ai.o
+
 timer.o: $(PROJ_SOURCE)/timer.cpp $(PROJ_HEADERS)/timer.h	
 	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/timer.cpp $(CPPFLAGS) -c -o timer.o
 
@@ -30,10 +33,10 @@ screen.o: $(PROJ_SOURCE)/screen.cpp  $(PROJ_HEADERS)/screen.h  $(PROJ_HEADERS)/b
 button.o: $(PROJ_SOURCE)/button.cpp  $(PROJ_HEADERS)/button.h  $(PROJ_HEADERS)/customevents.h  $(PROJ_HEADERS)/ltexture.h
 	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/button.cpp $(CPPFLAGS) -c -o button.o
 
-main.o: $(PROJ_SOURCE)/main.cpp $(PROJ_HEADERS)/board.h $(PROJ_HEADERS)/button.h  $(PROJ_HEADERS)/customevents.h  $(PROJ_HEADERS)/screen.h
+main.o: $(PROJ_SOURCE)/main.cpp $(PROJ_HEADERS)/board.h $(PROJ_HEADERS)/button.h  $(PROJ_HEADERS)/customevents.h  $(PROJ_HEADERS)/screen.h $(PROJ_HEADERS)/ai.h
 	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/main.cpp $(CPPFLAGS) -c -o main.o
 
-$(EXECUTABLE): timer.o ltexture.o board.o screen.o button.o main.o 
+$(EXECUTABLE): ai.o timer.o ltexture.o board.o screen.o button.o main.o 
 	$(CXX) $(CXXFLAGS) $^ $(CPPFLAGS) -o $@
 
 

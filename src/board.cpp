@@ -3,6 +3,7 @@
 #include "timer.h"
 #include "ltexture.h"
 #include "board.h"
+#include "ai.h"
 
 Board::Board(SDL_Renderer *ren)
 {
@@ -13,6 +14,7 @@ Board::Board(SDL_Renderer *ren)
 	winningState = -1;
 	renderWinning = true;
 	timer = Timer();
+	ai = AI();
 	locked = false;
 	timer.start();
 	loadTextures(ren);
@@ -21,6 +23,8 @@ Board::Board(SDL_Renderer *ren)
   	currentMouseoverTexture = xMouseover;
     	currentPieceTexture = xTexture;
     	currentMap = &xMap;
+	aiPlayer = &oMap;
+	humanPlayer = &xMap;
 }
 
 Board::~Board()
@@ -76,6 +80,8 @@ void Board::renderBoard(SDL_Renderer *ren)
 void Board::handleEvent(SDL_Event *e)
 {
 	if(!locked)
+	{	
+	if(currentMap != aiPlayer)
 	{
 	   if(e->type == SDL_MOUSEMOTION)
 	   {
@@ -104,23 +110,36 @@ void Board::handleEvent(SDL_Event *e)
 			{
 				if(insideBox(&board[i][j]) && !clickState[i][j])
 				{
-					clickState[i][j] = currentPieceTexture;
-					*currentMap = (*currentMap) | (0x1 << (i*BOARD_ROWS + j));
-					checkForWin();
-					if(draw || winner)
-					{
-						declareWinner();
-					}
-					else
-					{
-						toggleTurn();
-					}
+					makeMove(i, j);	
 				}
 			}
 		}
 	
 
   	   }
+	}
+	else
+	{
+		makeAIMove();
+	}
+	}
+}
+
+void Board::makeMove(int row, int col)
+{
+	if(!clickState[row][col])
+	{
+		clickState[row][col] = currentPieceTexture;
+		*currentMap = (*currentMap) | (0x1 << (row*BOARD_ROWS + col));
+		checkForWin();
+		if(draw || winner)
+		{
+			declareWinner();
+		}
+		else
+		{
+			toggleTurn();
+		}
 	}
 }
 
@@ -241,4 +260,13 @@ void Board::freeTextures()
 	delete oMouseover;
 	delete xTexture;
 	delete oTexture;
+}
+
+void Board::makeAIMove()
+{
+	int slotToFill = ai.getAIMove(*aiPlayer, *humanPlayer, winStates,sizeof(winStates)/sizeof(*winStates));  	
+	int row, col;
+	row = slotToFill / BOARD_ROWS;
+	col = slotToFill % BOARD_COLS;
+	makeMove(row,col);
 }

@@ -1,6 +1,6 @@
 #include "ai.h"
 #include <vector>
-#include <iostream>
+
 
 AI::AI()
 {
@@ -130,4 +130,16 @@ std::vector<unsigned int> * AI::produceMoves(unsigned int currentPlayerMap, unsi
 	return possibleMoves;
 }
 
+int AI::getAIMove(unsigned int currentPlayerMap, unsigned int enemyPlayerMap, unsigned int winStates[], int numOfWinStates)
+{
+	AIData aiMove = minimax(currentPlayerMap, enemyPlayerMap, winStates, numOfWinStates);
+	unsigned int playerMove = currentPlayerMap ^ aiMove.playerState;
+	for(int i = 0; i < numberOfBoardPositions; i++)
+	{
+		if(playerMove & (0x1 << i))
+		{
+			return i;
+		}
+	}
 
+}

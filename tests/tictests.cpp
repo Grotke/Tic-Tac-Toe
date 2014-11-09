@@ -43,5 +43,7 @@ TEST(AITest, movePrediction)
 	newData = ticAI.minimax(0x100,0x30,winStates, 8);
 	EXPECT_EQ(newData.playerState, 0x108);
 	newData = ticAI.minimax(0xE2,0x11C,winStates,8);
-	EXPECT_EQ(newData.playerState, 0xE3);
+	EXPECT_EQ(newData.playerState, 0xE3);	
+	newData = ticAI.minimax(0xC1,0x1E,winStates,8);
+	EXPECT_EQ(newData.playerState, 0xC1);
 }
