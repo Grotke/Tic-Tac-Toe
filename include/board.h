@@ -25,6 +25,7 @@ class Board
 		void freeTextures();
 		void makeMove(int row, int col);
 		void makeAIMove();
+		void checkIfAIShouldMove();
 		
 		static const int ANIMATION_FRAMES = 4;
 		static const int BOARD_ROWS = 3;
@@ -46,6 +47,8 @@ class Board
 		bool draw;
 		bool renderWinning;
 		int winningState;
+		int winRenderPingNumber;
+		int aiRenderPingNumber;
 		unsigned int oMap;
 		unsigned int xMap;
 		unsigned int *currentMap;

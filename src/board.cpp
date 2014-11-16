@@ -25,6 +25,9 @@ Board::Board(SDL_Renderer *ren)
     	currentMap = &xMap;
 	aiPlayer = &oMap;
 	humanPlayer = &xMap;
+
+	aiRenderPingNumber = timer.registerPingNumber();
+	winRenderPingNumber = timer.registerPingNumber();
 }
 
 Board::~Board()
@@ -35,20 +38,21 @@ Board::~Board()
 
 void Board::renderBoard(SDL_Renderer *ren)
 {
+	checkIfAIShouldMove();
 	for(int i = 0; i < BOARD_ROWS; i++)
 	{
 		for(int j = 0; j < BOARD_COLS; j++)
 		{ 
 	            SDL_RenderSetViewport(ren, &board[i][j]);
 		    if(winningState != -1 && ((winStates[winningState] >> (i*BOARD_ROWS+j)) & 0x1))
-		    {	if(!timer.isPingTimeSet())
+		    {	if(!timer.isPingTimeSet(winRenderPingNumber))
 			{
-				timer.startPingTime(300);
+				timer.startPingTime(300, winRenderPingNumber);
 			}
-			if(timer.pingTime())
+			if(timer.pingTime(winRenderPingNumber))
 			{
 				renderWinning = !renderWinning;
-				timer.startPingTime(300);	
+				timer.startPingTime(300,winRenderPingNumber);	
 			}
 			if(renderWinning)
 			{
@@ -69,9 +73,9 @@ void Board::renderBoard(SDL_Renderer *ren)
 			currentMouseoverTexture->render(ren);
 		    }
 		    if(clickState[i][j] != nullptr && frame[i][j]/10 < ANIMATION_FRAMES-1)
-			{
+		    {
 				frame[i][j]++;
-			}
+		    }
 				
 		} 
 	}
@@ -79,8 +83,8 @@ void Board::renderBoard(SDL_Renderer *ren)
 
 void Board::handleEvent(SDL_Event *e)
 {
-	if(!locked)
-	{	
+     if(!locked)
+     {	
 	if(currentMap != aiPlayer)
 	{
 	   if(e->type == SDL_MOUSEMOTION)
@@ -101,27 +105,39 @@ void Board::handleEvent(SDL_Event *e)
 		}
 	   }
 
-	if(e->type == SDL_MOUSEBUTTONDOWN)
-	{
-
-		for(int i = 0; i < BOARD_ROWS; i++)
+		if(e->type == SDL_MOUSEBUTTONDOWN)
 		{
-			for(int j = 0; j < BOARD_COLS; j++)
+
+			for(int i = 0; i < BOARD_ROWS; i++)
 			{
-				if(insideBox(&board[i][j]) && !clickState[i][j])
+				for(int j = 0; j < BOARD_COLS; j++)
 				{
-					makeMove(i, j);	
+					if(insideBox(&board[i][j]) && !clickState[i][j])
+					{
+						makeMove(i, j);	
+					}
 				}
 			}
-		}
-	
+		
 
-  	   }
+		   }
 	}
-	else
+      }
+}
+
+void Board::checkIfAIShouldMove()
+{
+	if(currentMap == aiPlayer && !locked)
 	{
-		makeAIMove();
-	}
+		if(!timer.isPingTimeSet(aiRenderPingNumber))
+		{
+			timer.startPingTime(1000,aiRenderPingNumber);
+		}
+		else if(timer.pingTime(aiRenderPingNumber))
+		{
+			makeAIMove();
+			timer.clearPingTime(aiRenderPingNumber);
+		}
 	}
 }
 
@@ -148,10 +164,10 @@ bool Board::insideBox(SDL_Rect *box)
     bool inside = true;
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
-    if(mouseX < box->x
-       || mouseX > box->x + box->w
-       || mouseY < box->y
-       || mouseY > box->y + box->h)
+    if(mouseX <= box->x
+       || mouseX >= box->x + box->w
+       || mouseY <= box->y
+       || mouseY >= box->y + box->h)
     {
         inside = false;
     }
