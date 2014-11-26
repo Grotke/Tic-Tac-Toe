@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <iostream>
 #include "timer.h"
 
 Timer::Timer()
@@ -18,6 +19,7 @@ Timer::~Timer()
 
 void Timer::initializePings()
 {
+	pingsAllocated = 0;
 	for(int i = 0; i < MAX_PINGS; i++)
 	{	
 		isPingAllocated[i] = false;

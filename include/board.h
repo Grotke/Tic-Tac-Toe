@@ -9,7 +9,7 @@ class Board
 {
 
 	public:
-		Board(SDL_Renderer *ren);
+		Board(SDL_Renderer *ren, char humanSymbol);
 		~Board();
 		void renderBoard(SDL_Renderer *ren);	
 		void handleEvent(SDL_Event *event);
@@ -25,7 +25,12 @@ class Board
 		void freeTextures();
 		void makeMove(int row, int col);
 		void makeAIMove();
+		void initializeVariables();
+		void setUpTimer();
+		void setUpAI();
+		void setUpPlayers(char firstPlayer, char humanSymbol);
 		void checkIfAIShouldMove();
+		void releaseTimer();
 		
 		static const int ANIMATION_FRAMES = 4;
 		static const int BOARD_ROWS = 3;
@@ -38,6 +43,7 @@ class Board
 		LTexture *xTexture;
 		LTexture *xMouseover;
 		LTexture *oMouseover;
+		LTexture *boardHatchTexture;
 		SDL_Rect board[BOARD_ROWS][BOARD_COLS];
 		LTexture *clickState[BOARD_ROWS][BOARD_COLS];
 		int frame[BOARD_ROWS][BOARD_COLS];

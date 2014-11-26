@@ -1,11 +1,30 @@
 #include <SDL2/SDL.h>
 #include <iostream>
+#include <ctype.h>
 #include "timer.h"
 #include "ltexture.h"
 #include "board.h"
 #include "ai.h"
 
-Board::Board(SDL_Renderer *ren)
+
+Board::Board(SDL_Renderer *ren, char humanSymbol)
+{
+	initializeVariables();
+	setUpTimer();
+	setUpAI();
+	loadTextures(ren);
+        constructBoard(CELL_WIDTH,CELL_HEIGHT);
+        constructAnimationFrames(CELL_WIDTH,CELL_HEIGHT);
+  	setUpPlayers('X',humanSymbol);
+}
+
+Board::~Board()
+{
+	freeTextures();
+	releaseTimer();	
+}
+
+void Board::initializeVariables()
 {
 	winner = false;
 	draw = false;
@@ -13,27 +32,54 @@ Board::Board(SDL_Renderer *ren)
 	xMap = 0;
 	winningState = -1;
 	renderWinning = true;
-	timer = Timer();
-	ai = AI();
 	locked = false;
-	timer.start();
-	loadTextures(ren);
-        constructBoard(CELL_WIDTH,CELL_HEIGHT);
-        constructAnimationFrames(CELL_WIDTH,CELL_HEIGHT);
-  	currentMouseoverTexture = xMouseover;
-    	currentPieceTexture = xTexture;
-    	currentMap = &xMap;
-	aiPlayer = &oMap;
-	humanPlayer = &xMap;
+}
 
+void Board::setUpAI()
+{
+	ai = AI();
+}
+
+void Board::setUpPlayers(char firstPlayer, char humanSymbol)
+{
+	char lowerFirstPlayer = tolower(firstPlayer);
+	char lowerHumanSymbol = tolower(humanSymbol);
+	if(lowerFirstPlayer == 'x')
+	{
+	     currentMouseoverTexture = xMouseover;
+    	     currentPieceTexture = xTexture;
+    	     currentMap = &xMap;
+	}
+	else
+	{
+	    currentMouseoverTexture = oMouseover;
+	    currentPieceTexture = oTexture;
+	    currentMap = &oMap;	
+	}
+	if(lowerHumanSymbol == 'x')
+	{
+	    humanPlayer = &xMap;
+	    aiPlayer = &oMap;			
+	}
+	else
+	{
+	    humanPlayer = &oMap;
+	    aiPlayer = &xMap;
+	}
+}
+
+void Board::setUpTimer()
+{
+	timer = Timer();
+	timer.start();
 	aiRenderPingNumber = timer.registerPingNumber();
 	winRenderPingNumber = timer.registerPingNumber();
 }
 
-Board::~Board()
+void Board::releaseTimer()
 {
-	freeTextures();	
-
+	timer.releasePingNumber(aiRenderPingNumber);
+	timer.releasePingNumber(winRenderPingNumber);	
 }
 
 void Board::renderBoard(SDL_Renderer *ren)
@@ -79,6 +125,8 @@ void Board::renderBoard(SDL_Renderer *ren)
 				
 		} 
 	}
+	SDL_RenderSetViewport(ren,NULL);
+	boardHatchTexture->render(ren);
 }
 
 void Board::handleEvent(SDL_Event *e)
@@ -268,6 +316,7 @@ void Board::loadTextures(SDL_Renderer *ren)
      oMouseover = new LTexture(ren, "../assets/mouseoverblue.png");
      xTexture = new LTexture(ren, "../assets/xanimation.png");
      oTexture = new LTexture(ren, "../assets/circleanimation.png");
+     boardHatchTexture = new LTexture(ren, "../assets/boardHatch.png");
 }
 
 void Board::freeTextures()
@@ -276,6 +325,7 @@ void Board::freeTextures()
 	delete oMouseover;
 	delete xTexture;
 	delete oTexture;
+	delete boardHatchTexture;
 }
 
 void Board::makeAIMove()

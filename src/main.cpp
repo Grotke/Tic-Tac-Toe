@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     newScreen.addButton(button);
     newScreen.loadBackground(ren,"../assets/mouseoverState.png");
    
-    Board board = Board(ren);
+    Board board = Board(ren, 'X');
 
     while(!nextScreen)
     {
