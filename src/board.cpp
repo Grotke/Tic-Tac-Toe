@@ -5,6 +5,7 @@
 #include "ltexture.h"
 #include "board.h"
 #include "ai.h"
+#include "customevents.h"
 
 
 Board::Board(SDL_Renderer *ren, char humanSymbol)
@@ -22,6 +23,13 @@ Board::~Board()
 {
 	freeTextures();
 	releaseTimer();	
+}
+
+void Board::resetBoard(char humanSymbol)
+{
+	initializeVariables();
+	constructBoard(CELL_WIDTH, CELL_HEIGHT);
+	setUpPlayers('X',humanSymbol);
 }
 
 void Board::initializeVariables()
@@ -82,7 +90,7 @@ void Board::releaseTimer()
 	timer.releasePingNumber(winRenderPingNumber);	
 }
 
-void Board::renderBoard(SDL_Renderer *ren)
+void Board::render(SDL_Renderer *ren)
 {
 	checkIfAIShouldMove();
 	for(int i = 0; i < BOARD_ROWS; i++)
@@ -294,9 +302,19 @@ void Board::declareWinner()
 	if(draw)
 	{
 		std::cout << "Draw! Nobody wins." << std::endl;
+		SDL_Event event;
+		SDL_zero(event);
+		event.type = SDL_USEREVENT;
+		event.user.code = static_cast<int>(CustomEvent::GAMEENDED);
+		SDL_PushEvent(&event);			
 	}
 	else if(winner)
 	{
+		SDL_Event event;
+		SDL_zero(event);
+		event.type = SDL_USEREVENT;
+		event.user.code = static_cast<int>(CustomEvent::GAMEENDED);
+		SDL_PushEvent(&event);	
 		char win;
 		if(currentPieceTexture == xTexture)
 		{
@@ -307,7 +325,7 @@ void Board::declareWinner()
 		}
 		
 		std::cout << win << " wins!" << std::endl;
-	}	
+	}
 }
 
 void Board::loadTextures(SDL_Renderer *ren)

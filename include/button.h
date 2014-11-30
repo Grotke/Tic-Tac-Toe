@@ -10,6 +10,8 @@ class Button
 {
     public:
         Button(int x, int y, int width, int height, CustomEvent eventToRegister);
+	Button(int x, int y, SDL_Rect renderingBox, const std::string & sheetPath, const std::string & mouseoverPath, CustomEvent eventToRegister,SDL_Renderer *ren);
+	bool setTexturesSheet(SDL_Renderer *ren,const std::string & sheetPath, const std::string & mouseoverPath);
         ~Button();
         void free();
         void disable();
@@ -29,8 +31,10 @@ class Button
         enum class ButtonState : char {NORMAL = 0,MOUSEOVER = 1,CLICKED = 2};
         int buttonX, buttonY, buttonW, buttonH;
         ButtonState currentState;
+	SDL_Rect source;
         bool insideButton();
 	bool renderable;
+	bool isSheet;
         TextureSharedPtr buttonTextures[TOTAL_BUTTON_STATES];
 };
 

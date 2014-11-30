@@ -19,9 +19,14 @@ class Screen
         void disableAllButtons();
         void enableAllButtons();
 	void handleEvent(SDL_Event *e);
+	void addTextRenderDestination(SDL_Rect dest);
+	SDL_Rect addText(SDL_Renderer *ren, const std::string &message, const std::string &fontFile, SDL_Color color, int fontSize);
+	void setBackgroundAlpha(Uint8 alpha);
 
     private:
 	std::vector<Button> buttons;
+	std::vector<LTexture *> messages;
+	std::vector<SDL_Rect> textDestinations;
 	LTexture *background;
 };
 

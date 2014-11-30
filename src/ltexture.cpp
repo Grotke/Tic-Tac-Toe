@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <string>
 #include <iostream>
 #include "ltexture.h"
@@ -14,8 +15,10 @@ LTexture::LTexture()
 LTexture::LTexture(SDL_Renderer *ren, const std::string &path)
 {
 	loadFromFile(ren,path);
-	width = 0;
-	height = 0;
+	if(texture != nullptr)
+	{
+		SDL_QueryTexture(texture,NULL,NULL,&width,&height);	
+	}
 }
 
 LTexture::~LTexture()
@@ -27,6 +30,11 @@ void LTexture::setSize(int textureWidth, int textureHeight)
 {
 	width = textureWidth;
 	height = textureHeight;	
+}
+
+void LTexture::setAlpha(Uint8 alpha)
+{
+	SDL_SetTextureAlphaMod(texture,alpha);
 }
 
 void LTexture::free()
@@ -43,6 +51,33 @@ void LTexture::free()
 void LTexture::render(SDL_Renderer * ren, SDL_Rect *source, SDL_Rect *destination)
 {
 	SDL_RenderCopy(ren,texture,source,destination);
+}
+
+void LTexture::createTextureFromFont(SDL_Renderer *ren, const std::string &message,const std::string &fontFile, SDL_Color color, int fontSize)
+{
+	TTF_Font *font = TTF_OpenFont(fontFile.c_str(),fontSize);
+	if(font == nullptr)
+	{
+		std::cout << "Couldn't load font." << std::endl;
+	}
+	SDL_Surface *surf = TTF_RenderText_Blended(font,message.c_str(),color);
+	if(surf == nullptr)
+	{
+		TTF_CloseFont(font);
+		std::cout << "Couldn't produce font surface." << std::endl;
+	}
+	
+	texture = SDL_CreateTextureFromSurface(ren,surf);
+	if(texture == nullptr)
+	{
+		std::cout << "Couldn't create texture from font." << std::endl;
+	}
+	else
+	{
+		SDL_QueryTexture(texture,NULL,NULL,&width,&height);
+	}
+	SDL_FreeSurface(surf);	
+	TTF_CloseFont(font);
 }
 
 bool LTexture::loadFromFile(SDL_Renderer *ren, const std::string &path)

@@ -12,10 +12,44 @@ Button::Button(int x, int y, int width, int height, CustomEvent eventToRegister)
     buttonY = y;
     buttonW = width;
     buttonH = height;
+    isSheet = false;
     currentState = ButtonState::NORMAL;
     eventOnClick = eventToRegister;
     enabled = true;
     renderable = true;
+}
+
+Button::Button(int x, int y, SDL_Rect renderingBox, const std::string & sheetPath, const std::string & mouseoverPath, CustomEvent eventToRegister,SDL_Renderer *ren)
+{
+	setTexturesSheet(ren, sheetPath, mouseoverPath);
+	buttonX = x;
+	buttonY = y;
+	buttonW = renderingBox.w;
+	buttonH = renderingBox.h;
+	isSheet = true;
+	source = renderingBox;
+	currentState = ButtonState::NORMAL;
+	eventOnClick = eventToRegister;
+	enabled = true;
+	renderable = true;
+}
+
+bool Button::setTexturesSheet(SDL_Renderer *ren,const std::string & sheetPath, const std::string & mouseoverPath)
+{
+   bool success = true;
+    buttonTextures[static_cast<int>(ButtonState::NORMAL)] = TextureSharedPtr(new LTexture(ren,sheetPath));
+    buttonTextures[static_cast<int>(ButtonState::MOUSEOVER)] = TextureSharedPtr(new LTexture(ren,mouseoverPath));
+
+    for(int i = 0; i < TOTAL_BUTTON_STATES-1; i++)
+    {
+        if(!buttonTextures[i]->isTextureSet())
+        {
+            std::cout << "Error: " << SDL_GetError() << std::endl;
+            success = false;
+        }
+    }
+
+    return success;
 }
 
 Button::~Button()
@@ -54,10 +88,20 @@ bool Button::insideButton()
 
 void Button::render(SDL_Renderer* ren)
 {
-    if(renderable){
+    if(renderable && !isSheet){
    	SDL_Rect dest = {buttonX,buttonY, buttonW, buttonH};
     	buttonTextures[static_cast<int>(currentState)]->render(ren,nullptr, &dest);
     }
+    else if (renderable && isSheet)
+    {
+	SDL_Rect dest = {buttonX, buttonY, buttonW, buttonH};
+	buttonTextures[static_cast<int>(ButtonState::NORMAL)]->render(ren,&source,&dest);
+	if(ButtonState::MOUSEOVER == currentState)
+	{
+	   buttonTextures[static_cast<int>(currentState)]->render(ren,nullptr, &dest);
+	}
+    }
+    
 }
 
 

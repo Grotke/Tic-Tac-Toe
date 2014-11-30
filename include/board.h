@@ -11,7 +11,8 @@ class Board
 	public:
 		Board(SDL_Renderer *ren, char humanSymbol);
 		~Board();
-		void renderBoard(SDL_Renderer *ren);	
+		void resetBoard(char humanSymbol);
+		void render(SDL_Renderer *ren);	
 		void handleEvent(SDL_Event *event);
 
 	private:

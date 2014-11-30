@@ -13,7 +13,9 @@ class LTexture
 		bool loadFromFile(SDL_Renderer *ren, const std::string &path);
 		bool isTextureSet();
 		void free();
+		void setAlpha(Uint8 alpha);
 		void render(SDL_Renderer *ren,SDL_Rect *source = nullptr, SDL_Rect *destination = nullptr);
+		void createTextureFromFont(SDL_Renderer *ren,const std::string &message, const std::string &fontFile, SDL_Color color, int fontSize);
 		int getWidth() {return width;}
 		int getHeight() {return height;}
 	private:
