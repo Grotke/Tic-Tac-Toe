@@ -23,6 +23,7 @@ class Board
 		void checkForWin();
 		void declareWinner();
 		void loadTextures(SDL_Renderer *ren);
+		bool loadSounds();
 		void freeTextures();
 		void makeMove(int row, int col);
 		void makeAIMove();
@@ -43,6 +44,9 @@ class Board
 		LTexture *oTexture;
 		LTexture *xTexture;
 		LTexture *xMouseover;
+		Mix_Chunk *xSound;
+		Mix_Chunk *oSound;
+		Mix_Chunk *currentSound;
 		LTexture *oMouseover;
 		LTexture *boardHatchTexture;
 		SDL_Rect board[BOARD_ROWS][BOARD_COLS];

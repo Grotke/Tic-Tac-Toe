@@ -4,7 +4,7 @@ PROJ_HEADERS = $(PROJ_DIR)/include
 
 PROJ_SOURCE = $(PROJ_DIR)/src
 
-CPPFLAGS += -I$(PROJ_HEADERS) -lSDL2 -lSDL2_image -lSDL2_ttf
+CPPFLAGS += -I$(PROJ_HEADERS) -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 
 CXXFLAGS += -g -Wall -std=c++11
 

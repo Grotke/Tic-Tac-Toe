@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include <iostream>
 #include <ctype.h>
 #include "timer.h"
@@ -14,6 +15,7 @@ Board::Board(SDL_Renderer *ren, char humanSymbol)
 	setUpTimer();
 	setUpAI();
 	loadTextures(ren);
+	loadSounds();
         constructBoard(CELL_WIDTH,CELL_HEIGHT);
         constructAnimationFrames(CELL_WIDTH,CELL_HEIGHT);
   	setUpPlayers('X',humanSymbol);
@@ -23,6 +25,18 @@ Board::~Board()
 {
 	freeTextures();
 	releaseTimer();	
+}
+
+bool Board::loadSounds()
+{
+	bool success = true;
+	xSound = Mix_LoadWAV("../assets/xsound.wav");
+	oSound = Mix_LoadWAV("../assets/osound.wav");
+	if(!xSound || !oSound)
+	{
+	   success = false;
+	}
+	return success;	
 }
 
 void Board::resetBoard(char humanSymbol)
@@ -57,12 +71,14 @@ void Board::setUpPlayers(char firstPlayer, char humanSymbol)
 	     currentMouseoverTexture = xMouseover;
     	     currentPieceTexture = xTexture;
     	     currentMap = &xMap;
+	     currentSound = xSound;
 	}
 	else
 	{
 	    currentMouseoverTexture = oMouseover;
 	    currentPieceTexture = oTexture;
-	    currentMap = &oMap;	
+	    currentMap = &oMap;
+	    currentSound = oSound;	
 	}
 	if(lowerHumanSymbol == 'x')
 	{
@@ -117,6 +133,10 @@ void Board::render(SDL_Renderer *ren)
 		    else if(clickState[i][j] != nullptr)
 		    {
 			clickState[i][j]->render(ren,&spriteClips[frame[i][j]/10],nullptr);
+			if(frame[i][j] == 0)
+			{
+				Mix_PlayChannel(-1,currentSound,0);
+			}
 			if(frame[i][j]/10 < ANIMATION_FRAMES-1)
 			{
 				frame[i][j]++;
@@ -267,12 +287,14 @@ void Board::toggleTurn()
 		currentMouseoverTexture = oMouseover;
 		currentPieceTexture = oTexture;
 		currentMap = &oMap;
+		currentSound = oSound;
 	}
 	else
 	{
 		currentMouseoverTexture = xMouseover;
 		currentPieceTexture = xTexture;
 		currentMap = &xMap;
+		currentSound = xSound;
 	}
 }
 
@@ -301,10 +323,10 @@ void Board::declareWinner()
 {
 	if(draw)
 	{
-		std::cout << "Draw! Nobody wins." << std::endl;
 		SDL_Event event;
 		SDL_zero(event);
 		event.type = SDL_USEREVENT;
+		event.user.data1 = 0;
 		event.user.code = static_cast<int>(CustomEvent::GAMEENDED);
 		SDL_PushEvent(&event);			
 	}
@@ -313,18 +335,16 @@ void Board::declareWinner()
 		SDL_Event event;
 		SDL_zero(event);
 		event.type = SDL_USEREVENT;
-		event.user.code = static_cast<int>(CustomEvent::GAMEENDED);
-		SDL_PushEvent(&event);	
-		char win;
 		if(currentPieceTexture == xTexture)
 		{
-			win = 'X';
+			event.user.data1 = (void *)1;
 		}
-		else{
-			win = 'O';
+		else
+		{
+			event.user.data1 = (void *)2;
 		}
-		
-		std::cout << win << " wins!" << std::endl;
+		event.user.code = static_cast<int>(CustomEvent::GAMEENDED);
+		SDL_PushEvent(&event);	
 	}
 }
 
@@ -344,6 +364,8 @@ void Board::freeTextures()
 	delete xTexture;
 	delete oTexture;
 	delete boardHatchTexture;
+	Mix_FreeChunk(xSound);
+	Mix_FreeChunk(oSound);
 }
 
 void Board::makeAIMove()

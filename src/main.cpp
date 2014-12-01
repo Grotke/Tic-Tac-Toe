@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include "screengenerator.h"
 #include "button.h"
 #include "customevents.h"
@@ -30,6 +31,14 @@ int main(int argc, char* argv[])
     if(TTF_Init() != 0)
     {
 	logSDLError(std::cout, "TTF_Init");
+	SDL_Quit();
+	return 1;
+    }
+
+    if(Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048) < 0)
+    {
+	logSDLError(std::cout, "OpenAudio");
+	SDL_Quit();
 	return 1;
     }
     SDL_Window *win = SDL_CreateWindow("Tic-Tac-Toe!",100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
@@ -69,7 +78,7 @@ int main(int argc, char* argv[])
             {
 		if(e.user.code == static_cast<int>(CustomEvent::GAMEENDED))
 		{
-			currentScreen = &ScreenGenerator::createGameOver(ren);
+			currentScreen = &ScreenGenerator::createGameOver(ren, e.user.data1);
 		}
 		if(e.user.code == static_cast<int>(CustomEvent::GAMERESTARTED))
 		{
@@ -142,6 +151,7 @@ int main(int argc, char* argv[])
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
     IMG_Quit();
+    Mix_Quit();
     SDL_Quit();
 
     return 0;
