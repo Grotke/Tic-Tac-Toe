@@ -71,14 +71,14 @@ void Board::setUpPlayers(char firstPlayer, char humanSymbol)
 	     currentMouseoverTexture = xMouseover;
     	     currentPieceTexture = xTexture;
     	     currentMap = &xMap;
-	     currentSound = xSound;
+	     currentSound = oSound;
 	}
 	else
 	{
 	    currentMouseoverTexture = oMouseover;
 	    currentPieceTexture = oTexture;
 	    currentMap = &oMap;
-	    currentSound = oSound;	
+	    currentSound = xSound;	
 	}
 	if(lowerHumanSymbol == 'x')
 	{
@@ -287,14 +287,14 @@ void Board::toggleTurn()
 		currentMouseoverTexture = oMouseover;
 		currentPieceTexture = oTexture;
 		currentMap = &oMap;
-		currentSound = oSound;
+		currentSound = xSound;
 	}
 	else
 	{
 		currentMouseoverTexture = xMouseover;
 		currentPieceTexture = xTexture;
 		currentMap = &xMap;
-		currentSound = xSound;
+		currentSound = oSound;
 	}
 }
 
