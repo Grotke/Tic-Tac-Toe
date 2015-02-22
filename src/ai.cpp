@@ -3,16 +3,11 @@
 
 
 AI::AI()
-{
-
-}
+{}
 
 
 AI::~AI()
-{
-
-
-}
+{}
 
 int AI::evaluateMove(unsigned int currentPlayerMap, unsigned int enemyPlayerMap, unsigned int winStates[],int numberOfWinStates)
 {
@@ -142,4 +137,5 @@ int AI::getAIMove(unsigned int currentPlayerMap, unsigned int enemyPlayerMap, un
 		}
 	}
 
+	return -1;
 }

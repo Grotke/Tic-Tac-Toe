@@ -36,7 +36,7 @@ button.o: $(PROJ_SOURCE)/button.cpp  $(PROJ_HEADERS)/button.h  $(PROJ_HEADERS)/c
 screengenerator.o: $(PROJ_SOURCE)/screengenerator.cpp $(PROJ_HEADERS)/screengenerator.h $(PROJ_HEADERS)/button.h  $(PROJ_HEADERS)/customevents.h  $(PROJ_HEADERS)/screen.h 
 	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/screengenerator.cpp $(CPPFLAGS) -c -o screengenerator.o
 
-main.o: $(PROJ_SOURCE)/main.cpp $(PROJ_HEADERS)/board.h $(PROJ_HEADERS)/button.h  $(PROJ_HEADERS)/customevents.h  $(PROJ_HEADERS)/screen.h $(PROJ_HEADERS)/ai.h $(PROJ_HEADERS)/ltexture.h $(PROJ_HEADERS)/screengenerator.h
+main.o: $(PROJ_SOURCE)/main.cpp $(PROJ_HEADERS)/board.h  $(PROJ_HEADERS)/customevents.h $(PROJ_HEADERS)/screen.h $(PROJ_HEADERS)/screengenerator.h
 	$(CXX) $(CXXFLAGS) $(PROJ_SOURCE)/main.cpp $(CPPFLAGS) -c -o main.o
 
 $(EXECUTABLE): ai.o timer.o ltexture.o board.o screen.o button.o screengenerator.o main.o 
