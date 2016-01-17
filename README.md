@@ -13,7 +13,7 @@ This is a completed project with a tree-based AI, sounds and animations. I made 
 
 I chose Tic-Tac-Toe so I could concentrate on the project itself without thinking too hard about the game mechanics. Even so it was surprisingly difficult just figuring out where to start.
 
-Go to the website at the top for more info about the development process.
+Go to http://www.josephcmontgomery.com/projects.html#tic-tac-toe for more info about the development process.
 
 ## Build Instructions
 I don't remember much about building this but I think you'd need the SDL2, SDL2 TTF, SDL2 Mixer and SDL2 Image libraries. It was made on Ubuntu but I imagine it'd work without much change on many other Linux systems. It should technically also work on Windows but I haven't tried it.
